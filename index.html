@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' blob: data:; style-src 'self'; script-src 'self'">
+  <title>Filament Painting Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand"><b>F</b><span><strong>Filament Painting Lab</strong><small>Milestone 5</small></span></div>
+      <nav>
+        <button class="nav active" data-page="projects">Projects</button>
+        <button class="nav" data-page="image">Image</button>
+        <button class="nav" data-page="heightmap">Height Map</button>
+        <button class="nav" data-page="palette">Palette</button>
+        <button class="nav" data-page="inventory">Inventory</button>
+        <button class="nav" data-page="layers">Layers</button>
+        <button class="nav" data-page="settings">Settings</button>
+      </nav>
+      <p class="local-note"><strong>Local-only prototype</strong><br>No cloud database or AI connection.</p>
+    </aside>
+
+    <main>
+      <header>
+        <div><small>PRIVATE DESKTOP WORKSPACE</small><h1 id="title">Projects</h1></div>
+        <div class="actions"><span id="status">Loading local data</span><button id="save" class="primary">Save locally</button></div>
+      </header>
+
+      <section class="page active" id="projects">
+        <div class="hero"><div><small>MILESTONE 5</small><h2>Assign owned filaments to height bands and plan every color change</h2><p>The first color-planning engine uses inventory colors for a banded project preview, lets you define the color sequence, and calculates printable swap layers and heights.</p></div><b>M5</b></div>
+        <div class="grid">
+          <article class="card">
+            <h2>Local test project</h2>
+            <label>Project name<input id="projectName" type="text"></label>
+            <label>Notes<textarea id="projectNotes" rows="8" placeholder="Goals, print observations, or reminders"></textarea></label>
+          </article>
+          <article class="card">
+            <h2>Foundation status</h2>
+            <ul class="checklist">
+              <li class="done">Verified local project and source-image storage</li>
+              <li class="done">Non-destructive image preparation</li>
+              <li class="done">Banded physical height-map engine</li>
+              <li class="done">Inventory palette and color-change schedule</li>
+              <li>TD-based optical color prediction</li>
+              <li>Palette optimization and segmentation</li>
+              <li>STL and 3MF export</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="image">
+        <div class="image-workspace">
+          <article class="card image-controls-card">
+            <div class="card-head">
+              <div><small>NON-DESTRUCTIVE PREPARATION</small><h2>Image controls</h2></div>
+              <button id="resetAdjustments" type="button">Reset</button>
+            </div>
+
+            <label class="compact-drop">Choose or replace image<input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp"><small>PNG, JPG, or WEBP up to 40 MB</small></label>
+            <button id="removeImage" class="danger-button" type="button" disabled>Remove saved image</button>
+
+            <fieldset id="adjustmentControls" disabled>
+              <div class="control-section">
+                <div class="control-heading"><h3>Rotate</h3><output id="rotationValue">0°</output></div>
+                <div class="button-row"><button id="rotateLeft" type="button">Rotate left</button><button id="rotateRight" type="button">Rotate right</button></div>
+              </div>
+
+              <div class="control-section">
+                <div class="control-heading"><h3>Crop</h3><span>Percent removed from each edge</span></div>
+                <label class="range-row"><span>Top</span><input id="cropTop" type="range" min="0" max="45" step="1"><output id="cropTopValue">0%</output></label>
+                <label class="range-row"><span>Right</span><input id="cropRight" type="range" min="0" max="45" step="1"><output id="cropRightValue">0%</output></label>
+                <label class="range-row"><span>Bottom</span><input id="cropBottom" type="range" min="0" max="45" step="1"><output id="cropBottomValue">0%</output></label>
+                <label class="range-row"><span>Left</span><input id="cropLeft" type="range" min="0" max="45" step="1"><output id="cropLeftValue">0%</output></label>
+              </div>
+
+              <div class="control-section">
+                <div class="control-heading"><h3>Tone</h3><span>-100 to +100</span></div>
+                <label class="range-row"><span>Brightness</span><input id="brightness" type="range" min="-100" max="100" step="1"><output id="brightnessValue">0</output></label>
+                <label class="range-row"><span>Contrast</span><input id="contrast" type="range" min="-100" max="100" step="1"><output id="contrastValue">0</output></label>
+                <label class="range-row"><span>Shadows</span><input id="shadows" type="range" min="-100" max="100" step="1"><output id="shadowsValue">0</output></label>
+                <label class="range-row"><span>Highlights</span><input id="highlights" type="range" min="-100" max="100" step="1"><output id="highlightsValue">0</output></label>
+              </div>
+
+              <label class="toggle-row"><input id="grayscale" type="checkbox"><span><strong>Grayscale luminance preview</strong><small>Useful for judging value separation before height mapping.</small></span></label>
+            </fieldset>
+          </article>
+
+          <article class="card preview-card">
+            <div class="card-head"><div><small>PREPARED PREVIEW</small><h2 id="imageName">No image selected</h2></div></div>
+            <div class="image-stage"><canvas id="previewCanvas" aria-label="Prepared image preview"></canvas><span id="placeholder">Choose an image to begin preparing it</span></div>
+            <p id="previewMode" class="muted">No saved source image</p>
+            <dl class="image-metadata">
+              <div><dt>Original dimensions</dt><dd id="sourceDimensions">—</dd></div>
+              <div><dt>Prepared dimensions</dt><dd id="preparedDimensions">—</dd></div>
+              <div><dt>Aspect ratio</dt><dd id="aspectRatio">—</dd></div>
+              <div><dt>Rotation</dt><dd id="rotationMeta">—</dd></div>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="heightmap">
+        <div class="heightmap-workspace">
+          <article class="card height-controls-card">
+            <div class="card-head">
+              <div><small>FIRST GEOMETRY ENGINE</small><h2>Height-map settings</h2></div>
+              <button id="resetHeightMap" type="button">Reset</button>
+            </div>
+
+            <fieldset id="heightMapControls" disabled>
+              <div class="number-grid">
+                <label>Height bands<input id="heightLayerCount" type="number" min="2" max="64" step="1"></label>
+                <label>Printer layer height<select id="heightLayerHeight"><option value="0.04">0.04 mm</option><option value="0.06">0.06 mm</option><option value="0.08">0.08 mm</option><option value="0.10">0.10 mm</option><option value="0.12">0.12 mm</option><option value="0.16">0.16 mm</option><option value="0.20">0.20 mm</option></select></label>
+                <label>Minimum height<input id="heightMin" type="number" min="0" max="20" step="0.04"></label>
+                <label>Maximum height<input id="heightMax" type="number" min="0.02" max="40" step="0.04"></label>
+              </div>
+
+              <label class="toggle-row"><input id="heightInvert" type="checkbox"><span><strong>Invert height direction</strong><small>Make dark pixels tall and light pixels low.</small></span></label>
+            </fieldset>
+
+            <div class="height-actions">
+              <button id="exportHeightMap" class="primary" type="button" disabled>Export height-map PNG</button>
+              <p id="heightExportStatus" class="muted">Choose an image to generate a height map.</p>
+            </div>
+
+            <p class="info-note">The preview uses the prepared image’s luminance. White represents maximum height and black represents minimum height unless inverted.</p>
+          </article>
+
+          <article class="card preview-card">
+            <div class="card-head"><div><small>BANDED HEIGHT PREVIEW</small><h2>Printable grayscale map</h2></div></div>
+            <div class="height-map-stage"><canvas id="heightMapCanvas" aria-label="Banded height-map preview"></canvas><span id="heightMapPlaceholder">Choose and prepare an image first</span></div>
+            <div class="height-gradient" aria-hidden="true"></div>
+            <div class="gradient-labels"><span id="gradientLow">Minimum</span><span id="gradientHigh">Maximum</span></div>
+            <dl class="image-metadata height-metadata">
+              <div><dt>Preview dimensions</dt><dd id="heightMapDimensions">—</dd></div>
+              <div><dt>Requested bands</dt><dd id="requestedBands">—</dd></div>
+              <div><dt>Used gray levels</dt><dd id="usedLevels">—</dd></div>
+              <div><dt>Printable Z steps</dt><dd id="printableSteps">—</dd></div>
+              <div><dt>Height range</dt><dd id="heightRange">—</dd></div>
+              <div><dt>Relief depth</dt><dd id="reliefDepth">—</dd></div>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="palette">
+        <div class="palette-workspace">
+          <article class="card palette-controls-card">
+            <div class="card-head">
+              <div><small>PROJECT FILAMENT PALETTE</small><h2>Height-band assignments</h2></div>
+            </div>
+            <div class="button-row palette-buttons"><button id="autoPalette" type="button">Auto distribute</button><button id="addPaletteRange" type="button">Add color range</button></div>
+            <div id="paletteRanges" class="palette-ranges"></div>
+            <p class="info-note">Each range maps one inventory filament directly to a group of height bands. Use the arrows to move a color earlier or later in the print.</p>
+          </article>
+
+          <article class="card preview-card">
+            <div class="card-head"><div><small>DIRECT COLOR PREVIEW</small><h2>Inventory-color simulation</h2></div></div>
+            <div class="palette-stage"><canvas id="paletteCanvas" aria-label="Filament palette preview"></canvas><span id="palettePlaceholder">Choose and prepare an image first</span></div>
+            <p id="paletteStatus" class="muted">Add inventory colors and prepare an image.</p>
+            <dl class="image-metadata">
+              <div><dt>Filament colors</dt><dd id="paletteColorCount">—</dd></div>
+              <div><dt>Color ranges</dt><dd id="paletteRangeCount">—</dd></div>
+              <div><dt>Color swaps</dt><dd id="paletteSwapCount">—</dd></div>
+              <div><dt>Height bands</dt><dd id="paletteBandCount">—</dd></div>
+            </dl>
+          </article>
+        </div>
+
+        <article class="card schedule-card">
+          <div class="card-head">
+            <div><small>PRINTABLE PLAN</small><h2>Color-change schedule</h2></div>
+            <button id="exportSchedule" class="primary" type="button" disabled>Export schedule</button>
+          </div>
+          <p id="scheduleExportStatus" class="muted">The schedule updates automatically from the palette and height-map settings.</p>
+          <div class="table-wrap schedule-table-wrap">
+            <table class="schedule-table">
+              <thead><tr><th>Step</th><th>Action</th><th>Filament</th><th>Bands</th><th>Start layer</th><th>Start Z</th><th>Target heights</th></tr></thead>
+              <tbody id="scheduleBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="page" id="inventory">
+        <article class="card">
+          <div class="card-head"><div><small>PERSONAL FILAMENT LIBRARY</small><h2>Inventory</h2></div><button id="addFilament">Add filament</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Color</th><th>Brand</th><th>Name</th><th>Material</th><th>TD</th><th>Grams</th><th></th></tr></thead><tbody id="inventoryBody"></tbody></table></div>
+          <p class="muted">Palette previews use the selected hex colors. TD remains stored for the optical model planned after this milestone.</p>
+        </article>
+      </section>
+
+      <section class="page" id="layers">
+        <div class="grid layers-grid">
+          <article class="card"><div class="card-head"><div><small>EARLY MANUAL PROTOTYPE</small><h2>Layer stack</h2></div><button id="addLayer">Add layer</button></div><div id="layerList"></div></article>
+          <article class="card"><h2>Stack summary</h2><div id="stack" class="stack"></div><dl><div><dt>Enabled colors</dt><dd id="enabled">0</dd></div><div><dt>Total height</dt><dd id="height">0.00 mm</dd></div><div><dt>Color swaps</dt><dd id="swaps">0</dd></div></dl><p class="muted">This manual test stack is separate from the new Palette schedule and will be replaced by later print-generation tools.</p></article>
+        </div>
+      </section>
+
+      <section class="page" id="settings">
+        <div class="grid">
+          <article class="card"><h2>Workspace settings</h2><label>Default layer height<select id="layerHeight"><option value="0.08">0.08 mm</option><option value="0.10">0.10 mm</option><option value="0.12">0.12 mm</option></select></label><label>Default print width<input id="printWidth" type="number" min="1"></label></article>
+          <article class="card"><h2>Local data location</h2><p class="muted">Saved outside the GitHub repository in Electron's private application-data folder.</p><code id="dataPath">Loading path...</code></article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "filament-painting-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private local filament-painting workspace",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check renderer.js"
+  },
+  "devDependencies": {
+    "electron": "latest"
+  }
+}
